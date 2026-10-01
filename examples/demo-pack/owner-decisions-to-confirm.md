@@ -1,0 +1,4 @@
+- Tidyhome Ltd is the contracting party; its company number is to follow.
+- Everyone must be 18 or over.
+- Cleaners pay a platform fee; buyers pay no fee.
+- Buyers can cancel free of charge up to 24 hours before a booking.

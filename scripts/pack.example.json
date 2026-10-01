@@ -1,0 +1,47 @@
+{
+  "brand": "Acme",
+  "operator": "Acme Ltd",
+  "jurisdiction": "Examplia",
+  "lang": "en",
+  "page_title": "Acme Legal Pack",
+  "kicker": "Acme · Legal pack",
+  "heading": "Draft legal documents",
+  "lede": "Drafts prepared by an AI legal team for review by Acme Ltd and a qualified lawyer. Nothing here is legal advice.",
+  "meta": [
+    ["Prepared", "1 to 3 March 2026, by an AI legal team, checked by an AI red team"],
+    ["Status", "Draft for the owner's review"],
+    ["Contact used", "help@example.com for support, privacy requests and content complaints"]
+  ],
+  "hub_url": "",
+  "hub_label": "decisions tracker",
+  "drafts_dir": "drafts",
+  "research_dir": "research",
+  "redteam_file": "review/red-team-findings.md",
+  "output": "review.html",
+  "strip_notes_from_public": false,
+  "accent": "#3446A8",
+  "accent_dark": "#9AA9F2",
+  "public": [
+    {"key": "terms", "title": "Terms of Service", "file": "terms-of-service.md"},
+    {"key": "privacy", "title": "Privacy Policy", "file": "privacy-policy.md"},
+    {"key": "business", "title": "Business Terms", "file": "business-terms.md"},
+    {"key": "payments", "title": "Payments and Refunds", "file": "payments-and-refunds.md"},
+    {"key": "community", "title": "Community Guidelines", "file": "community-guidelines.md"},
+    {"key": "prohibited", "title": "Prohibited Listings", "file": "prohibited-listings.md"},
+    {"key": "ai", "title": "AI Features Notice", "file": "ai-features-notice.md"},
+    {"key": "consent", "title": "Consent Forms", "file": "consent-forms.md"}
+  ],
+  "internal": [
+    {"key": "counsel", "title": "Questions for Counsel", "file": "questions-for-counsel.md"},
+    {"key": "answers", "title": "Decider's Answers", "file": "counsel-answers.md"},
+    {"key": "changes", "title": "Product Changes Needed", "file": "app-changes-needed.md"},
+    {"key": "datamap", "title": "Data Map and Retention", "file": "data-map-and-retention.md", "scan": true},
+    {"key": "research", "title": "Law Research", "file": "law-research.md"},
+    {"key": "redteam", "title": "Red-team Review", "file": "../review/red-team-findings.md"}
+  ],
+  "research": [
+    {"label": "People, data, contracts and content (memo A)", "file": "law-A.md"},
+    {"label": "Money, tax and sector rules (memo B)", "file": "law-B.md"}
+  ],
+  "edits": []
+}

@@ -1,0 +1,2 @@
+- Refund buyers automatically when a cleaner cancels or does not show up (today support does it by hand).
+- Delete accounts on request; today the app only hides them.

@@ -1,0 +1,17 @@
+{
+  "brand": "Tidyhome",
+  "operator": "Tidyhome Ltd",
+  "jurisdiction": "Examplia",
+  "page_title": "Tidyhome Legal Pack",
+  "kicker": "Tidyhome (fictional) · Legal pack",
+  "heading": "Draft legal documents",
+  "meta": [
+    ["Prepared", "1 to 2 March 2026, by an AI legal team (fictional example)"],
+    ["Status", "Draft for the owner's review"],
+    ["Contact used", "help@example.com"]
+  ],
+  "research": [
+    {"label": "People, data, contracts and content (memo A)", "file": "law-A.md"},
+    {"label": "Money, tax and sector rules (memo B)", "file": "law-B.md"}
+  ]
+}
