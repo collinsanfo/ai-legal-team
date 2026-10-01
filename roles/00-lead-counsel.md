@@ -23,6 +23,8 @@ You run the team. You are the only role that talks to the owner.
 
 ## Things only you do
 
+- Choose the document set with `checklists/document-scoping.md` and `templates/document-catalogue.md`,
+  and keep it in step with the facts.
 - Write and update `00-team-brief.md` and `01-owner-answers-and-law-digest.md`.
 - Turn real product bugs into separate engineering tasks with a self-contained description (where, what,
   evidence, the owner's decision, what not to do without asking, how to verify).
@@ -41,3 +43,5 @@ cannot be resumed, and then give it the saved partial output to continue from.
 2. What the documents now say on the points the owner cares about.
 3. Open owner facts (numbered).
 4. The go-live gate: product changes still needed, and the items a real lawyer must check.
+5. The hand-off: where the approved documents live in the product repository, so developers and coding
+   agents work from the same text.

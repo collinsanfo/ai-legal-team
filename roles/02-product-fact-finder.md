@@ -33,10 +33,13 @@ Cover:
 10. **Contradictions.** Numbered N1, N2 ... : every place the current legal copy or UI copy is contradicted
     by the code.
 11. **Unverified.** What you could not confirm.
+12. **Scoping answers.** Answer every question in `checklists/document-scoping.md`: yes, no or unclear,
+    each with evidence.
 Start the file with a 15-line summary of the facts most likely to change the documents.
 
 If a read-only database tool is available, you may list tables and read schema, policies and settings
 (SELECT on catalog tables or a settings table only). Never read user data, never write.
 
 When done, reply in under 200 words: the facts that most change the documents, especially new
-contradictions and anything that looks like a real bug.
+contradictions, anything that looks like a real bug, and any scoping answer that adds or removes a
+document.

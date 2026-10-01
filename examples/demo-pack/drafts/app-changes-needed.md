@@ -16,6 +16,6 @@ Everything the product must change so the documents are true, gathered from ever
 
 1. Delete accounts and their personal data on request, keeping only records the law requires.
 
-### Data Map and Retention
+### Data Map and Retention Schedule
 
 1. Real account deletion, with a log of what was deleted and when.

@@ -1,7 +1,8 @@
 # Jurisdiction research checklist
 
-Give researcher A the A topics and researcher B the B topics. Add product-specific questions. Every answer
-needs a primary source and a confidence level.
+Give researcher A the A topics and researcher B the B topics, for every country in scope. Skip topics the
+chosen documents do not need (see `checklists/document-scoping.md`) and add product-specific questions.
+Every answer needs a primary source and a confidence level.
 
 ## Set A: people, data, contracts, content
 1. **Data protection:** registration with the regulator (who, when, fees, renewal, offence if missing);
@@ -22,6 +23,15 @@ needs a primary source and a confidence level.
    intermediary safe harbour and the notice-and-take-down process; duties to report illegal content.
 7. **Disputes:** arbitration against consumers; mediation; courts and small claims.
 8. **Company disclosure:** what an online business must show about itself.
+9. **Cookies and tracking:** consent for cookies, SDKs and pixels; what counts as strictly necessary.
+10. **Platform duties:** notice and action, reasons for moderation decisions, appeals, trader checks,
+    ranking transparency, transparency reports.
+11. **Children and online safety:** age limits, parental consent, design codes, risk assessments.
+12. **AI:** transparency and risk rules for AI features; automated decisions about people.
+13. **Accessibility:** whether accessibility laws apply to the product.
+14. **Reviews and advertising:** fake reviews, endorsements, sponsored content, ad labels.
+15. **Platform policies that act like law:** app-store rules (privacy answers, account deletion,
+    subscriptions) and the payment processor's terms.
 
 ## Set B: money, tax, sectors
 1. **Payments licensing:** does collecting buyers' money and paying sellers later need a licence? What
@@ -41,6 +51,10 @@ needs a primary source and a confidence level.
 6. **Prohibited and restricted goods:** narcotics, weapons, wildlife, counterfeit and stolen goods,
    tobacco and alcohol rules, prescription medicines, precious metals, chemicals; plus a major
    marketplace's restricted-products list as a baseline.
+7. **Subscriptions:** automatic renewal, free trials, cancellation and price-change rules.
+8. **Physical goods:** product safety and labelling, legal guarantees, returns.
+9. **Promotions:** contests and giveaways, gift cards and vouchers, loyalty schemes.
+10. **Business customers:** data processing terms, transfer clauses, liability between businesses.
 
 ## Worked example: Ghana (from one run, September 2026; verify current status before relying on it)
 | Area | Laws the run relied on |

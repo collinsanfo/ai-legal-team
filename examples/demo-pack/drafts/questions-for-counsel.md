@@ -24,7 +24,7 @@ Every question for a qualified Examplia lawyer, gathered from the drafts, the re
 - **1. Who is responsible for your data:** confirm registration is required before launch
 - **4. Your rights:** the legal deadline, thought to be 21 days under the Data Protection Act (fictional)
 
-### Data Map and Retention
+### Data Map and Retention Schedule
 
 - **1. Record of processing:** confirm the tax-law period
 

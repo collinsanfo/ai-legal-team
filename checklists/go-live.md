@@ -12,6 +12,9 @@ own statements untrue, and those cannot be disclaimed.
       for every sign-in method.
 - [ ] A legal screen lists every public document with its version, effective date and last-updated date.
 - [ ] Copy elsewhere in the product (help pages, checkout, receipts, AI screens) matches the documents.
+- [ ] Every item in `checklists/product-implementation.md` that applies is done.
+- [ ] The approved documents and the product changes list are in the product repository (for example
+      `docs/legal/`) and referenced from `AGENTS.md`, `CLAUDE.md` or the README.
 
 ## Operator and regulators
 - [ ] The operator's legal name, registration number, address, phone and email are filled in.

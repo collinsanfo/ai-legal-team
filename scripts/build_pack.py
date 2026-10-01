@@ -20,13 +20,19 @@ Options:
     --check-publish  exit with status 1 unless every public document is ready to publish: no DRAFT
                      banner and no [OWNER], [COUNSEL], [DECISION] or [APP CHANGE] marker left in its body
 
+Which documents: every .md file in the drafts folder. templates/document-catalogue.md gives each standard
+file name its title, its place in the order and its audience (public or internal). A file the catalogue
+does not know is shown as a public document, or as an internal one if its name starts with "internal-".
+The "public" and "internal" lists in pack.json replace what is found.
+
 Config: PACK_DIR/pack.json (see scripts/pack.example.json). Every key is optional.
     brand, operator, jurisdiction   names used in headings and default text
     lang                            page language (default "en")
     page_title, kicker, heading, lede, meta ([label, value] rows), hub_url, hub_label
-    drafts_dir, research_dir, redteam_file, output
-    public      [{key, title, file}]        default: the standard file names in DEFAULT_PUBLIC
-    internal    [{key, title, file, scan}]  scan: true also collects that document's markers
+    drafts_dir, research_dir, redteam_file, output, catalogue (path to another catalogue)
+    public      [{key, title, file}]        replaces the public documents found
+    internal    [{key, title, file, scan}]  replaces the internal documents found; scan: true also
+                                            collects that document's markers
     research    [{label, file}]             default: every .md file in research_dir
     strip_notes_from_public                 true once approved: public documents show without notes
     accent, accent_dark                     link and heading colour in light and dark mode
@@ -38,6 +44,7 @@ Optional files in PACK_DIR, copied in when present:
 import argparse
 import html
 import json
+import os
 import pathlib
 import re
 import sys
@@ -48,24 +55,24 @@ try:
 except ImportError:  # pragma: no cover
     sys.exit("This script needs python-markdown. Install it with: pip install markdown")
 
-DEFAULT_PUBLIC = [
-    ("terms", "Terms of Service", "terms-of-service.md"),
-    ("privacy", "Privacy Policy", "privacy-policy.md"),
-    ("business", "Business Terms", "business-terms.md"),
-    ("payments", "Payments and Refunds", "payments-and-refunds.md"),
-    ("community", "Community Guidelines", "community-guidelines.md"),
-    ("prohibited", "Prohibited Listings", "prohibited-listings.md"),
-    ("ai", "AI Features Notice", "ai-features-notice.md"),
-    ("consent", "Consent Forms", "consent-forms.md"),
+CATALOGUE = pathlib.Path(__file__).resolve().parent.parent / "templates" / "document-catalogue.md"
+ENTRY = re.compile(r"^### (.+?) \u00b7 `([A-Za-z0-9._-]+\.md)` \u00b7 (public|internal)[ \t]*$", re.M)
+FALLBACK_CATALOGUE = [  # used only when the catalogue file cannot be read
+    ("Terms of Service", "terms-of-service.md", "public"),
+    ("Privacy Policy", "privacy-policy.md", "public"),
+    ("Business Terms", "business-terms.md", "public"),
+    ("Payments and Refunds", "payments-and-refunds.md", "public"),
+    ("Community Guidelines", "community-guidelines.md", "public"),
+    ("Prohibited Listings", "prohibited-listings.md", "public"),
+    ("AI Features Notice", "ai-features-notice.md", "public"),
+    ("Consent Forms", "consent-forms.md", "public"),
+    ("Data Map and Retention", "data-map-and-retention.md", "internal"),
 ]
-DEFAULT_INTERNAL = [
-    ("counsel", "Questions for Counsel", "questions-for-counsel.md", False),
-    ("answers", "Decider's Answers", "counsel-answers.md", False),
-    ("changes", "Product Changes Needed", "app-changes-needed.md", False),
-    ("datamap", "Data Map and Retention", "data-map-and-retention.md", True),
-    ("research", "Law Research", "law-research.md", False),
-    ("redteam", "Red-team Review", "../review/red-team-findings.md", False),
-]
+# Reports written by the team or by this script: always internal, never scanned for markers.
+REPORTS_FIRST = [("Questions for Counsel", "questions-for-counsel.md"),
+                 ("Decider's Answers", "counsel-answers.md"),
+                 ("Product Changes Needed", "app-changes-needed.md")]
+REPORTS_LAST = [("Law Research", "law-research.md")]
 KINDS = ("OWNER", "COUNSEL", "DECISION", "APP CHANGE")
 
 # Headings the research memos use (see roles/01-law-researcher.md); matched without regard to case.
@@ -218,8 +225,21 @@ def needs_counsel_rows(text):
 
 
 # ---------------------------------------------------------------- the pack
+def load_catalogue(path):
+    """[(title, file, audience)] from the catalogue's '### Title · `file.md` · audience' headings."""
+    try:
+        found = ENTRY.findall(read(path))
+    except OSError:
+        found = []
+    return [(t.strip(), f, a) for t, f, a in found] or list(FALLBACK_CATALOGUE)
+
+
 def slug(key):
     return re.sub(r"[^a-z0-9-]+", "-", str(key).lower()).strip("-") or "doc"
+
+
+def doc_key(name):
+    return slug(pathlib.PurePosixPath(name).stem)
 
 
 class Pack:
@@ -230,16 +250,40 @@ class Pack:
         self.research_dir = root / cfg.get("research_dir", "research")
         self.redteam = root / cfg.get("redteam_file", "review/red-team-findings.md")
         self.output = root / cfg.get("output", "review.html")
+        catalogue = load_catalogue(root / cfg["catalogue"] if cfg.get("catalogue") else CATALOGUE)
+        public, internal = self.discover(catalogue)
         self.public = [(slug(d["key"]), d["title"], d["file"]) for d in cfg["public"]] \
-            if "public" in cfg else list(DEFAULT_PUBLIC)
+            if "public" in cfg else public
         self.internal = [(slug(d["key"]), d["title"], d["file"], bool(d.get("scan"))) for d in cfg["internal"]] \
-            if "internal" in cfg else list(DEFAULT_INTERNAL)
+            if "internal" in cfg else internal
         if "research" in cfg:
             memos = [(r.get("label") or pathlib.Path(r["file"]).stem, self.research_dir / r["file"])
                      for r in cfg["research"]]
         else:
             memos = [(p.stem, p) for p in sorted(self.research_dir.glob("*.md"))]
         self.memos = [(label, read(p)) for label, p in memos if p.exists()]
+
+    def discover(self, catalogue):
+        """(public, internal) documents in the drafts folder, titled and ordered by the catalogue."""
+        reports = {name for _, name in REPORTS_FIRST + REPORTS_LAST}
+        present = {p.name for p in self.drafts.glob("*.md")} - reports
+        public, internal = [], []
+        for title, name, audience in catalogue:
+            if name in present:
+                present.discard(name)
+                (public if audience == "public" else internal).append((title, name))
+        for name in sorted(present):
+            words = pathlib.Path(name).stem.split("-")
+            if words[0] == "internal" and len(words) > 1:
+                internal.append((" ".join(words[1:]).capitalize(), name))
+            else:
+                public.append((" ".join(words).capitalize(), name))
+                print(f"note: {name} is not in the catalogue, so it is shown as a public document")
+        redteam = pathlib.Path(os.path.relpath(self.redteam, self.drafts)).as_posix()
+        return ([(doc_key(n), t, n) for t, n in public],
+                [(doc_key(n), t, n, False) for t, n in REPORTS_FIRST]
+                + [(doc_key(n), t, n, True) for t, n in internal]
+                + [(doc_key(n), t, n, False) for t, n in REPORTS_LAST + [("Red-team Review", redteam)]])
 
     def scanned(self):
         """(title, path) of every document whose markers are collected: all public, and internal with scan."""

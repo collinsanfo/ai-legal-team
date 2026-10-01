@@ -35,4 +35,5 @@ use AI, sell. Mark what is live and what is not.}}
 [DECISION n].}}
 
 ## 7. The document set
-{{Public documents and internal documents, and which role drafts each.}}
+{{From `checklists/document-scoping.md`: each document, why the product needs it, and which role
+drafts it. The countries in scope.}}

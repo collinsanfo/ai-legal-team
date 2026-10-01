@@ -17,8 +17,8 @@ Read, and nothing more unless you need an exact fact or citation:
 5. Only for an exact citation: the research memos.
 Never modify the product repository.
 
-Write {{FILES}} in {{PACK}}/drafts/, following `templates/document-format.md` and the contents checklist
-for each document in `templates/documents.md`.
+Write {{FILES}} in {{PACK}}/drafts/, following `templates/document-format.md` and the catalogue entry
+for each document in `templates/document-catalogue.md` (its "Must cover" list and "Watch" notes).
 
 Rules:
 - Write for the behaviour the product will have when the document is published, and mark every sentence

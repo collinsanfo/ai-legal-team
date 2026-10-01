@@ -24,7 +24,8 @@ Hunt for:
    cannot give them, missing mandatory privacy-notice items, missing supplier information or take-down
    contact.
 5. **Form:** banner, version line, "In short", markers, plain English, the brand's vocabulary rules.
-6. **Gaps** a {{JURISDICTION}} marketplace plainly needs and no document covers.
+6. **Gaps:** documents the scoping answers call for that are missing, and topics a {{JURISDICTION}}
+   product like this plainly needs that no document covers.
 
 Fix directly, with small targeted edits, anything clear-cut, and update the affected notes sections. Do not
 make judgement calls that belong to the owner or a lawyer (a liability figure, a retention period,
