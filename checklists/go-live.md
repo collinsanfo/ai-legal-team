@@ -30,7 +30,21 @@ own statements untrue, and those cannot be disclaimed.
 
 ## Publishing
 - [ ] `python scripts/build_pack.py PACK --check-publish` passes: no draft banner and no marker left in
-      any public document.
+      any public document, including review notes; scoped documents, evidence and release records are
+      complete and tied to exact bytes. See `references/publish-gate.md`.
 - [ ] Published copies drop the notes sections and all markers; the annotated pack stays internal.
-- [ ] The effective date is the day the documents are published in the product.
+- [ ] The owner-approved effective date and any required notice/transition period are recorded.
 - [ ] Users are told about the change; earlier versions are archived.
+
+## Software and evidence, when applicable
+- [ ] `required_public_documents` explicitly records the approved scope in `pack.json`; none are missing.
+- [ ] Independent evidence review resolved contradictory/unsupported accepted material claims. Relevant
+      laws and platform rules were checked for the real territory and effective date.
+- [ ] Software/IP review covers the actual release's dependencies, assets and distribution; notices and
+      ownership/contract gaps are resolved or held by counsel with a documented decision.
+- [ ] App-store answers, SDK/permission behavior and legal claims match the assessed release. Local,
+      native, hosted and store acceptance evidence are recorded separately.
+- [ ] Actual owner approval, qualified counsel review and product verification artifacts support the
+      release records. AI proposed decisions are not counsel review or owner approval.
+- [ ] The publisher has authorization to publish. A passing local script does not grant authorization,
+      certify legal compliance, authenticate a reviewer or prove the deployed product matches the pack.

@@ -25,3 +25,8 @@ Do:
 
 Work in small edits. When done, reply in under 100 words: what changed per file and any marker you could
 not resolve.
+
+Do not write release-attestation records from this role's instructions alone. Actual owner approval,
+qualified counsel review and product verification need separate dated evidence artifacts. An AI
+decider's proposed answer does not replace counsel. Editing final text invalidates its earlier hashes;
+re-review the exact changed bytes under `references/publish-gate.md` before reporting ready to publish.

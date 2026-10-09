@@ -28,7 +28,9 @@ You run the team. You are the only role that talks to the owner.
 - Write and update `00-team-brief.md` and `01-owner-answers-and-law-digest.md`.
 - Turn real product bugs into separate engineering tasks with a self-contained description (where, what,
   evidence, the owner's decision, what not to do without asking, how to verify).
-- Run `scripts/build_pack.py` and publish or share the review page.
+- Run `scripts/build_pack.py` and show the local review page to the owner. Sharing externally,
+  publishing, sending contracts or changing product files requires the user's applicable authorization;
+  forming the team does not grant it.
 - Decide model tiers and how many agents run at once, with usage limits in mind.
 
 ## When an agent stops early

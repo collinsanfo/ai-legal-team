@@ -9,9 +9,9 @@ behind them.
 
 What makes it different from "write me a privacy policy":
 
-- **It scopes from the product.** Forty-three yes/no questions about the product (accounts, payments,
+- **It scopes from the product.** Fifty-one yes/no questions about the product (accounts, payments,
   subscriptions, listings, posts, messages, tracking, AI, apps, business customers, countries) pick the
-  documents from a catalogue of 56. A simple app may need six; a marketplace with payments, AI and users
+  documents and review records from a catalogue of 63. A simple app may need six; a marketplace with payments, AI and users
   in several countries may need twenty-five.
 - **It checks the product first.** A fact-finder maps what the code really does, with file-and-line
   evidence, so no document claims something the product does not do. Anything not true yet becomes a
@@ -26,6 +26,11 @@ What makes it different from "write me a privacy policy":
 - **It hands engineering a work list:** every product change the documents depend on, and where each
   document must appear in the product.
 - **It is cheap to review.** A script (no AI) builds one review page from the Markdown files.
+- **It reviews the software work itself.** Specialists cover code and asset licensing, ownership,
+  development contracts/SOWs, vendor exit and handover, app-store/privacy evidence and source verification.
+  Reviews stay separate from signing, negotiation and publication.
+- **It checks declared evidence.** Release gates require scoped documents, local source snapshots and
+  hash-bound owner/counsel/product review records. They cannot authenticate reviewers or establish legal truth.
 
 > **Not legal advice.** Everything this kit produces is a draft prepared by AI systems. Have a qualified
 > lawyer in each jurisdiction review the final documents before you publish them.
@@ -41,7 +46,7 @@ of what to ask a real lawyer.
 
 Everything is chosen for your product. Nothing is added just to make the pack bigger.
 
-### 1. Public documents, picked from a catalogue of 56
+### 1. Public documents, picked from the product's actual scope
 
 | Area | Documents (each one only when your product needs it) |
 |---|---|
@@ -76,6 +81,22 @@ and a law research summary with sources and confidence levels.
 Every product change the documents depend on, real bugs found along the way as separate tasks, and an
 implementation checklist: where each document must appear, what to record (acceptances and consents), and
 how to hand the documents to developers and coding agents.
+
+### Software, app and website review modes
+
+Use a focused review without generating every product document:
+
+| Need | Added workflow |
+|---|---|
+| Software/asset licensing and IP | Version-bound dependency and asset inventory, actual license texts, distribution model, notices and ownership questions |
+| Developer, agency or vendor contract | SOW and acceptance, change control, IP, confidentiality, security/data duties, maintenance, source/account control and exit |
+| Web/mobile release | SDK/data/permission map, deletion and moderation, store privacy answers, claim evidence and distinct local/native/hosted/store results |
+| Citation and product truth | Independent source support, jurisdiction/effective-date checks, file snapshots/hashes, explicit unknown and contradictory claims |
+
+The catalogue adds seven scoped software work products: development agreement, SOW, contributor/IP
+agreement, third-party notices, materials register, supply-chain review and contract issue review.
+Private agreements, findings and evidence stay internal. No tracked-change DOCX engine or autonomous
+legal-service runtime is bundled; this is an agent skill with deterministic Python helpers.
 
 ### 6. One review page and a go-live gate
 All documents on one page, with open points colour-coded, and a check that fails while anything is still a
@@ -120,21 +141,53 @@ The full playbook is in [`SKILL.md`](SKILL.md). Each role has its own prompt in 
 
 - An agent that can read files and, for the research roles, search and open web pages.
 - Read access to the product's code (or a written description of what it does, if there is no code).
-- Python 3.8 or later with `pip install markdown`, to build the review page with `scripts/build_pack.py`.
+- Python 3.12 or later (recommended), with the pinned dependencies in `requirements.txt`, for the review
+  page and deterministic evidence/release helpers.
 
 ### Try the build script
 
 ```
-pip install markdown
-python scripts/build_pack.py examples/demo-pack
+py -3.12 -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe scripts/build_pack.py examples/demo-pack
 ```
 
 This builds the fictional demo pack: `questions-for-counsel.md`, `app-changes-needed.md` and
 `law-research.md` in its `drafts/` folder, and `review.html`, one page with every document and the markers
 colour-coded. The script finds the documents in the drafts folder and titles them from the catalogue. Use
-`--page-only` to rebuild just the page, and `--check-publish` before go-live (it fails while any public
-document is still a draft or carries a marker). Settings go in the pack's optional `pack.json`; see
+`--page-only` to rebuild just the page, and `--check-publish` before go-live. It fails on incomplete scope,
+drafts/markers, unresolved review work, missing evidence or stale review hashes. Settings go in the pack's
+optional `pack.json` for review builds; release checks require explicit scope and review records. See
 [`scripts/pack.example.json`](scripts/pack.example.json) and the notes at the top of the script.
+
+The demo deliberately fails the release check. Do not turn fictional evidence into approvals.
+For the exact schemas and commands, read [the release gate](references/publish-gate.md) and
+[the evidence ledger](references/evidence-schema.md).
+
+### Codex installation
+
+Install this repository root as `ai-legal-team` under your Codex skills directory. With Codex's bundled
+skill-installer, use its `install-skill-from-github.py` helper:
+
+```text
+python PATH_TO_SKILL_INSTALLER/scripts/install-skill-from-github.py --repo collinsanfo/ai-legal-team --path . --name ai-legal-team
+```
+
+Use `--ref BRANCH_OR_COMMIT` to install a reviewed upgrade before merging it. The installer does not
+overwrite an existing skill; preserve any local edits before updating. The skill is available on your
+next turn. Ask: **"Use $ai-legal-team to prepare a private, read-only legal intake for this product."**
+Install the Python requirements in a dedicated environment inside the installed skill when you need
+its review-page and evidence helpers. No model-provider keys or extra agent framework are required.
+
+### Validation and performance evidence
+
+Run `python -m unittest discover -s tests -v` in the prepared Python environment. These are local
+tooling tests, separate from model behavior, legal review, GitHub CI, native and production acceptance.
+The synthetic review exercises and fair comparison protocol are in [evals/README.md](evals/README.md).
+
+[The GitHub comparison](references/github-comparison-2026-10-09.md) records inspected projects,
+source/license caveats and the design choices behind this upgrade. No comparable independent result
+establishes a universal best team, and this kit has no measured cross-kit legal-accuracy score.
 
 ## Using the documents with coding agents
 
@@ -155,7 +208,11 @@ templates/                        brief, owner answers, owner questions, documen
 checklists/document-scoping.md    the questions that pick the document set
 checklists/                       jurisdiction research, product implementation, go-live gate
 scripts/build_pack.py             builds the consolidated documents and the review page (no AI)
+scripts/validate_evidence.py      checks declared evidence and exact local hashes (no AI/network)
 scripts/pack.example.json
+references/                      software, contract, privacy, evidence and gate workflows
+evals/                           synthetic behavior exercises and comparison protocol
+tests/                           isolated deterministic gate regressions
 examples/demo-pack/               a tiny fictional pack (try the script on it)
 ```
 

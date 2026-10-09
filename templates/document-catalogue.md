@@ -9,9 +9,9 @@ published to users or customers; internal: for the operator, the lawyer and engi
 script uses the file name to title, order and group each document. **Needed when** says what triggers
 it. **Must cover** lists the contents. **Watch** names rules that often apply.
 
-The laws under **Watch** are common examples from the EU, the UK and the US, current to late 2026. They
-are not complete, and they may not apply where the product operates. The researchers confirm what
-applies, with sources.
+The laws under **Watch** are discovery examples from the EU, the UK and the US. Their inclusion is not
+an assertion that they are current, complete or applicable. The researchers open current primary texts
+and verify territorial scope, commencement and exemptions for the actual product and launch markets.
 
 ## 1. Core
 
@@ -413,3 +413,47 @@ apply (for example the EU AI Act); human oversight; testing; incidents.
 applies.
 **Must cover:** the illegal-content risk assessment and, where children can use the service, the
 children's risk assessment; measures; review dates.
+
+## 14. Software development and delivery
+
+These are scoped work products for owner/counsel review. Private agreements and inventories stay
+internal; adding them to this catalogue does not authorize negotiation or signature.
+
+### Development Services Agreement · `development-services-agreement.md` · internal
+**Needed when:** software, an app or a website is commissioned or delivered under a services contract.
+**Must cover:** parties and precedence; SOW/change control; delivery and acceptance; fees and taxes;
+IP/background materials/OSS; confidentiality; security/data roles; warranties; support; liability,
+indemnity and remedies for counsel review; termination and transition. Use the owner's approved playbook.
+
+### Statement of Work · `statement-of-work.md` · internal
+**Needed when:** the development contract needs measurable project scope and acceptance.
+**Must cover:** versioned requirements, deliverables, dependencies, milestones, acceptance tests,
+review/cure windows, change approval, documentation, source/build handover, support and exit criteria.
+**Watch:** acceptance criteria must be observable; a local test cannot promise native/hosted acceptance.
+
+### Contributor and IP Agreement · `contributor-ip-agreement.md` · internal
+**Needed when:** employees, contractors or contributors produce software or assets and ownership or
+reuse rights need documenting. Review existing agreements before drafting replacements.
+**Must cover:** contribution scope, authority, assignment/license and timing, retained background IP,
+third-party materials, confidentiality, permitted portfolio use and jurisdiction-specific counsel questions.
+
+### Third-party Notices · `third-party-notices.md` · public
+**Needed when:** actual third-party license terms require distribution notices or attribution.
+**Must cover:** the materials and versions actually shipped, required copyright/license/attribution
+texts and delivery locations. Verify each notice against the source license; do not remove required text
+just to match the kit's prose format. This is not a license compatibility or trademark clearance report.
+
+### Software Materials and Ownership Register · `internal-software-materials.md` · internal
+**Needed when:** the product uses software, SDKs, external/generated assets, models or datasets.
+**Must cover:** version/hash, provenance, actual license/terms, ownership evidence, modifications,
+distribution model, obligations and unresolved items. Use `templates/software-materials.md`.
+
+### Software Supply-chain Review · `internal-software-supply-chain.md` · internal
+**Needed when:** redistributed/browser/mobile/customer-hosted artifacts or dependencies need release review.
+**Must cover:** inventory/SBOM coverage, lockfile/release binding, notices/source-delivery checks, security
+claims and update responsibility, evidence limits, remediation and actual release acceptance criteria.
+
+### Development Contract Review · `internal-development-contract-review.md` · internal
+**Needed when:** a supplied development/vendor contract, NDA, SOW or maintenance agreement needs review.
+**Must cover:** clause-specific issues, approved positions, missing schedules/facts, proposed replacements,
+fallbacks and owner/counsel decisions. Use `templates/development-contract-review.md`; preserve the original.

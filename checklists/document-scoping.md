@@ -88,3 +88,20 @@ scope.
 | 41 | Users in Germany or Austria? | Legal Notice (Imprint) |
 | 42 | Many users anywhere else? | Run the jurisdiction research for that country too |
 | 43 | Is the software sold or distributed in the EU as a product (apps, desktop software, firmware)? | Cyber Resilience Act questions for counsel |
+
+## Software development and delivery
+
+These questions also select specialist review outputs; they do not automatically add public policies.
+Record yes, no or unclear with version-bound evidence. Answer only the applicable extension for a
+narrow software or contract review; a complete product pack answers both scoping sections.
+
+| # | Question | If yes, add |
+|---|---|---|
+| 44 | Are third-party code, SDKs, fonts, icons, media, models or datasets used? | Software Materials and Ownership Register; license/IP review; Third-party Notices when the actual terms require them |
+| 45 | Do contractors, employees, contributors or agencies produce deliverables? | Contributor and IP Agreement review; chain-of-title questions; never assume the missing agreement exists |
+| 46 | Is software or a website commissioned from, or delivered to, a customer? | Development Services Agreement; Statement of Work; Development Contract Review |
+| 47 | Are source, domains, store/cloud accounts, data or maintenance handed over on exit? | Exit/ownership/transition checks in the Development Contract Review and SOW |
+| 48 | Is software or an SDK redistributed, bundled into a browser/mobile app, customer-hosted or exposed as a network service? | Distribution-specific software-license review; Software Supply-chain Review |
+| 49 | Are AI-generated code/assets or provider-hosted AI used in development or the product? | Provenance/provider terms review; AI data/security/ownership questions; public AI notices only if the product exposes AI features |
+| 50 | Are privacy/security/impact/accessibility or platform compliance claims made? | Platform/privacy evidence matrix; independent claim verification; hold unsupported claims |
+| 51 | Are law, platform rules, providers, jurisdictions or release artifacts changing? | Evidence refresh and release records bound to exact selected public document bytes |

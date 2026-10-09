@@ -1,4 +1,6 @@
 __pycache__/
 *.pyc
+.venv/
+.coverage
 # The review page is generated: python scripts/build_pack.py examples/demo-pack
 examples/demo-pack/review.html

@@ -45,3 +45,13 @@ records. The team lists what is missing as product changes; engineering ships th
 - `python scripts/build_pack.py PACK --check-publish` passes.
 - Every link works on the web, iOS and Android, signed in and signed out.
 - The app-store answers match the Privacy Policy and the code.
+
+## Software and delivery hand-off
+- Resolve each applicable software/IP finding against the exact release materials and license texts.
+  Carry required notices into web/mobile artifacts and verify their visibility and coverage.
+- Bind scope, approved public text, claim evidence and review records to hashes. After any material
+  document, code, vendor, jurisdiction or policy change, re-review affected obligations and statements.
+- Turn development/SOW promises into measurable acceptance criteria and record local/native/hosted
+  results separately. Never replace an existing complete client with a pilot to make a checklist pass.
+- Keep source/domain/cloud/store ownership and secure credential handover as actual project tasks;
+  do not paste secrets or private contracts into the public documentation.
