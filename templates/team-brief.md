@@ -37,3 +37,10 @@ use AI, sell. Mark what is live and what is not.}}
 ## 7. The document set
 {{From `checklists/document-scoping.md`: each document, why the product needs it, and which role
 drafts it. The countries in scope.}}
+
+## 8. Software review and evidence scope
+{{Requested modes: document pack, software/IP, contract review, platform/privacy or evidence check.}}
+{{Product commit and dirty-worktree state; exact release surfaces; applicable extension questions.}}
+{{Operator/launch jurisdictions confirmed by whom and when; unknown facts remain unknown.}}
+{{Private evidence locations, permitted source access, source/claim IDs, independent reviewer.}}
+{{For a public pack: required_public_documents in pack.json; do not invent release approvals.}}

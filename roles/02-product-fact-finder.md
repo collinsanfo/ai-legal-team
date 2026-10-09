@@ -37,6 +37,12 @@ Cover:
     each with evidence.
 Start the file with a 15-line summary of the facts most likely to change the documents.
 
+Record commit, dirty-worktree state and hashes for cited files. Label each fact observed, planned or
+unverified and distinguish local code, native-device, hosted and store evidence. Answer the software
+scoping extension for a full pack and route the relevant specialist outputs. Include SDK/dependency and
+asset provenance, browser/native/server distribution, contractor ownership and delivery promises when
+triggered. Never infer operator identity, jurisdiction or ownership from a developer account.
+
 If a read-only database tool is available, you may list tables and read schema, policies and settings
 (SELECT on catalog tables or a settings table only). Never read user data, never write.
 

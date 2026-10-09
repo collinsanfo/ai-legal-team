@@ -17,15 +17,16 @@ Always writes:
 
 Options:
     --page-only      rebuild the page only; keeps generated documents an AI consolidator has polished
-    --check-publish  exit with status 1 unless every public document is ready to publish: no DRAFT
-                     banner and no [OWNER], [COUNSEL], [DECISION] or [APP CHANGE] marker left in its body
+    --check-publish  exit with status 1 unless explicit document scope, evidence and hash-bound
+                     owner/counsel/product records pass the mechanical gate (not legal approval).
 
 Which documents: every .md file in the drafts folder. templates/document-catalogue.md gives each standard
 file name its title, its place in the order and its audience (public or internal). A file the catalogue
 does not know is shown as a public document, or as an internal one if its name starts with "internal-".
 The "public" and "internal" lists in pack.json replace what is found.
 
-Config: PACK_DIR/pack.json (see scripts/pack.example.json). Every key is optional.
+Config: PACK_DIR/pack.json (see scripts/pack.example.json). Keys are optional for review builds;
+release checks require explicit scope, evidence and review records.
     brand, operator, jurisdiction   names used in headings and default text
     lang                            page language (default "en")
     page_title, kicker, heading, lede, meta ([label, value] rows), hub_url, hub_label
@@ -35,6 +36,8 @@ Config: PACK_DIR/pack.json (see scripts/pack.example.json). Every key is optiona
                                             collects that document's markers
     research    [{label, file}]             default: every .md file in research_dir
     strip_notes_from_public                 true once approved: public documents show without notes
+    required_public_documents               explicit nonempty list of drafts-relative file names
+    release_attestation, evidence_ledger     release record paths; see references/publish-gate.md
     accent, accent_dark                     link and heading colour in light and dark mode
     counsel_intro, changes_intro, research_intro
     edits       [{file, find, replace}]     applied to the generated documents after each build
@@ -49,11 +52,17 @@ import pathlib
 import re
 import sys
 
+from validate_evidence import (
+    digest, evidence_problems, file_record_problems, load_json, local_path, nonempty,
+    timestamp_problem,
+)
+
 try:
     import markdown
+    import nh3
     from markdown.extensions.toc import slugify
 except ImportError:  # pragma: no cover
-    sys.exit("This script needs python-markdown. Install it with: pip install markdown")
+    sys.exit("Install this script's pinned dependencies with: python -m pip install -r requirements.txt")
 
 CATALOGUE = pathlib.Path(__file__).resolve().parent.parent / "templates" / "document-catalogue.md"
 ENTRY = re.compile(r"^### (.+?) \u00b7 `([A-Za-z0-9._-]+\.md)` \u00b7 (public|internal)[ \t]*$", re.M)
@@ -102,18 +111,16 @@ def read_optional(path):
 
 def split_notes(md):
     """(body, notes): the notes start at the '## Notes ...' heading, if there is one."""
-    m = re.search(r"^## Notes\b.*$", md, re.M)
+    m = re.search(r"^## Notes\b.*$", md, re.M | re.I)
     return (md[: m.start()], md[m.start():]) if m else (md, "")
 
 
 def markers(text, kind):
     """Every [KIND ...] marker in text as (position, marker), nested brackets included."""
-    found, i, tag = [], 0, "[" + kind
-    while (j := text.find(tag, i)) >= 0:
-        after = text[j + len(tag): j + len(tag) + 1]
-        if after and after not in ": ]\t":
-            i = j + 1  # a longer word, such as [OWNERSHIP
-            continue
+    found, i = [], 0
+    pattern = re.compile(r"\[" + re.escape(kind) + r"(?=[: \]\t\r\n]|$)", re.I)
+    while (match := pattern.search(text, i)) is not None:
+        j = match.start()
         depth, k = 0, j
         while k < len(text):
             depth += {"[": 1, "]": -1}.get(text[k], 0)
@@ -398,6 +405,39 @@ LEGEND = (("OWNER", "a fact or choice only the owner can give"),
           ("DECISION", "follows one of the owner's decisions"))
 COLOR = re.compile(r"^#[0-9a-fA-F]{3,8}$")
 
+# Sanitize every untrusted fragment AFTER Markdown rendering and marker highlighting.
+# Raw HTML is accepted by Python-Markdown; escaping config titles alone cannot secure it.
+CONTENT_TAGS = {
+    "a", "abbr", "b", "blockquote", "br", "code", "dd", "del", "div", "dl", "dt", "em",
+    "h1", "h2", "h3", "h4", "h5", "h6", "hr", "i", "kbd", "li", "mark", "ol", "p",
+    "pre", "s", "samp", "small", "strong", "sub", "sup", "table", "tbody", "td", "tfoot",
+    "th", "thead", "tr", "ul",
+}
+INLINE_TAGS = {
+    "a", "abbr", "b", "br", "code", "del", "em", "i", "kbd", "mark", "s", "samp",
+    "small", "strong", "sub", "sup",
+}
+REMOVE_CONTENT = {
+    "script", "style", "iframe", "object", "embed", "svg", "math", "form", "template",
+    "noscript", "noembed", "noframes", "xmp", "plaintext", "textarea", "title",
+}
+CONTENT_ATTRIBUTES = {"a": {"href", "title"}, "abbr": {"title"}, "ol": {"start"},
+                      "td": {"colspan", "rowspan", "style"}, "th": {"colspan", "rowspan", "style"}}
+CONTENT_ATTRIBUTES.update({tag: {"id"} for tag in ("h1", "h2", "h3", "h4", "h5", "h6")})
+SAFE_CLASSES = {"div": {"table-wrap"},
+                "mark": {"mk", "mk-owner", "mk-counsel", "mk-app", "mk-decision"}}
+SAFE_SCHEMES = {"https", "http", "mailto", "tel"}
+DOCUMENT_CLEANER = nh3.Cleaner(
+    tags=CONTENT_TAGS, clean_content_tags=REMOVE_CONTENT, attributes=CONTENT_ATTRIBUTES,
+    allowed_classes=SAFE_CLASSES, url_schemes=SAFE_SCHEMES, strip_comments=True,
+    filter_style_properties={"text-align"}, link_rel="noopener noreferrer",
+)
+INLINE_CLEANER = nh3.Cleaner(
+    tags=INLINE_TAGS, clean_content_tags=REMOVE_CONTENT,
+    attributes={"a": {"href", "title"}, "abbr": {"title"}}, allowed_classes=SAFE_CLASSES,
+    url_schemes=SAFE_SCHEMES, strip_comments=True, link_rel="noopener noreferrer",
+)
+
 
 def highlight(fragment):
     return MARK.sub(lambda m: f'<mark class="mk mk-{MARK_CLASS[m.group(1)]}">[{m.group(1)}{m.group(2)}]</mark>',
@@ -407,7 +447,7 @@ def highlight(fragment):
 def inline(md):
     """Render a short Markdown string (bold, links, code) without the surrounding paragraph."""
     out = markdown.markdown(str(md)).strip()
-    return highlight(re.sub(r"\A<p>(.*)</p>\Z", r"\1", out, flags=re.S))
+    return INLINE_CLEANER.clean(highlight(out))
 
 
 def to_html(key, md):
@@ -418,7 +458,7 @@ def to_html(key, md):
     )
     out = conv.convert(rebase(md, 2))
     out = out.replace("<table>", '<div class="table-wrap"><table>').replace("</table>", "</table></div>")
-    return highlight(out)
+    return DOCUMENT_CLEANER.clean(highlight(out))
 
 
 CSS = """
@@ -503,9 +543,10 @@ def page(pack, sections_html):
 <html lang="{html.escape(cfg.get('lang', 'en'))}">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; style-src 'unsafe-inline'; img-src 'none'; font-src 'none'; connect-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(cfg.get('page_title', f'{brand} Legal Pack'))}</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>{css}</style>
 </head>
 <body>
@@ -554,19 +595,168 @@ def marker_report(pack):
         print(f"  {path.name:<36} {counts}")
 
 
+def tasks_closed(text):
+    """Accept only an explicit empty task list or completed checkbox lines, not approval prose."""
+    lines = [line.strip() for line in text.splitlines()
+             if line.strip() and not re.match(r"^\s*#{1,6}\s", line)]
+    if not lines:
+        return True
+    if len(lines) == 1 and re.fullmatch(
+        r"(?:[-*]\s*)?(?:none\.?|no (?:code )?changes (?:needed|required)\.?)", lines[0], re.I):
+        return True
+    return all(re.match(r"^(?:[-*]|\d+[.)])\s+\[[xX]\]\s+", line) for line in lines)
+
+
+def redteam_open_rows(text):
+    """Detect explicit unresolved state in a review table's action/status columns."""
+    for header, cells in table_rows(text):
+        for i, title in enumerate(header):
+            if not any(name in title for name in ("action", "status", "resolution")) or i >= len(cells):
+                continue
+            value = cells[i].strip("*_ `").lower()
+            if re.match(r"^(?:open|unresolved|pending|blocked|todo|tbd|tbc)\b|"
+                        r"^needs (?:counsel|owner|decision|app change|engineering)\b", value):
+                return True
+    return False
+
+
 def publish_problems(pack):
     problems = []
+    names = [name for _, _, name in pack.public]
+    required = pack.cfg.get("required_public_documents")
+    if not isinstance(required, list) or not required or any(not nonempty(n) for n in required):
+        problems.append("pack.json: explicit nonempty required_public_documents scope is required")
+        required = []
+    if len(required) != len(set(required)):
+        problems.append("pack.json: required_public_documents must be unique")
+    if not names:
+        problems.append("public document set is empty")
+    if len(names) != len(set(names)):
+        problems.append("public document set contains duplicate files")
+    for name in required:
+        if name not in names:
+            problems.append(f"{name}: required public document not selected or missing")
     for _, _, name in pack.public:
-        path = pack.drafts / name
-        if not path.exists():
+        try:
+            drafts = local_path(pack.root, pack.cfg.get("drafts_dir", "drafts"))
+            path = local_path(drafts, name)
+        except ValueError as error:
+            problems.append(f"{name}: {error}")
             continue
-        body = split_notes(read(path))[0]
-        if re.search(r"\*\*\s*DRAFT\b", body):
-            problems.append(f"{name}: still carries the DRAFT banner")
+        if not path.is_file():
+            problems.append(f"{name}: selected public document missing")
+            continue
+        try:
+            text = read(path)
+        except (OSError, UnicodeError) as error:
+            problems.append(f"{name}: cannot read public document ({error})")
+            continue
+        body, notes = split_notes(text)
+        # A file containing headings alone is not a public document.
+        substantive = re.sub(r"^\s*#{1,6}\s+.*$", "", body, flags=re.M).strip()
+        if not substantive:
+            problems.append(f"{name}: public document body is empty")
+        if re.search(r"^\s*(?:#{1,6}\s*|>\s*|[-*]\s*)?(?:\*\*|__)?\s*DRAFT\b|"
+                     r"^\s*#{1,6}\s+[^\n]*\bdraft\b|\(\s*draft\s*\)", text, re.M | re.I):
+            problems.append(f"{name}: still carries a draft heading, banner or version")
         for kind in KINDS:
-            n = len(markers(body, kind))
+            n = len(markers(text, kind))
             if n:
-                problems.append(f"{name}: {n} [{kind}] marker(s) left")
+                problems.append(f"{name}: {n} [{kind}] marker(s) left, including review notes")
+        if re.search(r"\b(?:TODO|TBD|TBC)\b|^\s*(?:[-*]|\d+[.)])\s+\[ \]|"
+                     r"\bneeds counsel\b|\b(?:status|decision)\s*:\s*(?:unresolved|pending|blocked)\b",
+                     text, re.M | re.I):
+            problems.append(f"{name}: unresolved placeholder, checklist or review status remains")
+        for _, sec in sections(notes, H_CODE_CHANGES):
+            if not tasks_closed(body_of(sec)):
+                problems.append(f"{name}: code changes in review notes lack completed checklist records")
+    for filename in ("owner-decisions-to-confirm.md", "known-fix-tasks.md", "owner-driven-changes.md"):
+        text = read_optional(pack.root / filename)
+        if text and (not tasks_closed(text) or any(markers(text, kind) for kind in KINDS)):
+            problems.append(f"{filename}: upstream decisions or product tasks remain open")
+    if pack.redteam.is_file():
+        text = read(pack.redteam)
+        if needs_counsel_rows(text) or redteam_open_rows(text) or any(markers(text, kind) for kind in KINDS) or re.search(
+            r"^\s*(?:[-*]|\d+[.)])\s+\[ \]|\b(?:status|action)\s*:\s*(?:open|unresolved|pending|blocked)\b",
+            text, re.M | re.I):
+            problems.append("red-team findings: unresolved review markers or tasks remain")
+    problems.extend(evidence_problems(pack.root, pack.cfg, names))
+    problems.extend(attestation_problems(pack, names, required))
+    return problems
+
+
+def attestation_problems(pack, names, required):
+    """Check declared approval records. Hashes detect edits; they do not authenticate a signer."""
+    problems = []
+    try:
+        path = local_path(pack.root, pack.cfg.get("release_attestation", "release-attestation.json"))
+    except ValueError as error:
+        return [f"release attestation: {error}"]
+    record, errors = load_json(path, "release attestation")
+    problems.extend(errors)
+    if record is None:
+        return problems
+    if type(record.get("schema_version")) is not int or record["schema_version"] != 1:
+        problems.append("release attestation: schema_version must be 1")
+    if record.get("required_public_documents") != required:
+        problems.append("release attestation: required_public_documents differs from pack scope")
+    documents = record.get("documents")
+    if not isinstance(documents, dict) or set(documents) != set(names):
+        problems.append("release attestation: documents must match every selected public file exactly")
+        documents = documents if isinstance(documents, dict) else {}
+    for name in names:
+        entry = documents.get(name)
+        if not isinstance(entry, dict):
+            problems.append(f"release attestation: document hash missing for {name}")
+        else:
+            filename = pathlib.Path(pack.cfg.get("drafts_dir", "drafts")) / name
+            problems.extend(file_record_problems(pack.root, {"file": filename.as_posix(),
+                "sha256": entry.get("sha256")}, f"release document {name}"))
+    ledger = {"file": pack.cfg.get("evidence_ledger", "evidence-ledger.json"),
+              "sha256": record.get("evidence_ledger_sha256")}
+    problems.extend(file_record_problems(pack.root, ledger, "release evidence ledger"))
+    for kind in ("owner_approval", "counsel_review", "product_verification"):
+        review = record.get(kind)
+        label = f"release {kind}"
+        if not isinstance(review, dict):
+            problems.append(f"{label}: verified review record missing")
+            continue
+        if review.get("status") != "verified":
+            problems.append(f"{label}: status must be verified")
+        if not nonempty(review.get("reviewer")):
+            problems.append(f"{label}: reviewer identity is required")
+        problem = timestamp_problem(review.get("reviewed_at"))
+        if problem:
+            problems.append(f"{label}: reviewed_at {problem}")
+        if kind == "counsel_review":
+            if not nonempty(review.get("jurisdiction")):
+                problems.append(f"{label}: reviewed jurisdiction is required")
+            elif pack.cfg.get("jurisdiction") and review["jurisdiction"] != pack.cfg["jurisdiction"]:
+                problems.append(f"{label}: jurisdiction differs from pack configuration")
+        evidence = review.get("evidence")
+        if not isinstance(evidence, list) or not evidence:
+            problems.append(f"{label}: nonempty evidence file records are required")
+        else:
+            for i, item in enumerate(evidence):
+                problems.extend(file_record_problems(pack.root, item, f"{label} evidence {i + 1}"))
+    blockers = record.get("blockers")
+    if not isinstance(blockers, list):
+        problems.append("release attestation: explicit blockers list is required (empty if none)")
+    else:
+        ids = set()
+        for i, blocker in enumerate(blockers):
+            label = f"release blocker {i + 1}"
+            if not isinstance(blocker, dict):
+                problems.append(f"{label}: must be an object")
+                continue
+            ident = blocker.get("id")
+            if not nonempty(ident) or ident in ids:
+                problems.append(f"{label}: nonempty unique id is required")
+            else:
+                ids.add(ident)
+            if blocker.get("status") != "resolved":
+                problems.append(f"{label}: remains unresolved")
+            problems.extend(file_record_problems(pack.root, blocker.get("resolution"), f"{label} resolution"))
     return problems
 
 
@@ -575,7 +765,7 @@ def main():
     ap.add_argument("pack", type=pathlib.Path, help="the pack folder")
     ap.add_argument("--config", type=pathlib.Path, help="config file (default: PACK/pack.json)")
     ap.add_argument("--page-only", action="store_true", help="rebuild the page without regenerating documents")
-    ap.add_argument("--check-publish", action="store_true", help="exit 1 unless public documents are ready to publish")
+    ap.add_argument("--check-publish", action="store_true", help="exit 1 unless the mechanical release gate passes")
     args = ap.parse_args()
     try:
         sys.stdout.reconfigure(errors="replace")
@@ -609,7 +799,8 @@ def main():
             print("Not ready to publish:")
             print("\n".join(f"  - {p}" for p in problems))
             sys.exit(1)
-        print("Ready to publish: no banner or markers left in the public documents.")
+        print("Mechanical release gate passed: scope, markers, evidence and hash-bound review records checked.")
+        print("This does not authenticate reviewers, verify legal correctness or authorize publication.")
 
 
 if __name__ == "__main__":

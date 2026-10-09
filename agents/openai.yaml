@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Legal Team"
+  short_description: "Evidence-backed legal review for software products"
+  default_prompt: "Use $ai-legal-team to prepare a private legal review pack from this product's actual code and launch scope."

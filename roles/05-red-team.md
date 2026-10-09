@@ -26,6 +26,10 @@ Hunt for:
 5. **Form:** banner, version line, "In short", markers, plain English, the brand's vocabulary rules.
 6. **Gaps:** documents the scoping answers call for that are missing, and topics a {{JURISDICTION}}
    product like this plainly needs that no document covers.
+7. **Evidence and delivery:** unsupported propositions despite a plausible citation, stale law/platform
+   rules, incorrect territorial scope, missing licenses/ownership/contract schedules, and claims that
+   promote a local or browser result to native, hosted or production proof. Read the raw evidence;
+   preserve disagreement. Check `references/evidence-workflow.md` and the triggered specialist findings.
 
 Fix directly, with small targeted edits, anything clear-cut, and update the affected notes sections. Do not
 make judgement calls that belong to the owner or a lawyer (a liability figure, a retention period,

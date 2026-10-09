@@ -19,6 +19,9 @@
   "redteam_file": "review/red-team-findings.md",
   "output": "review.html",
   "strip_notes_from_public": false,
+  "required_public_documents": ["terms-of-service.md", "privacy-policy.md"],
+  "release_attestation": "release-attestation.json",
+  "evidence_ledger": "evidence-ledger.json",
   "accent": "#3446A8",
   "accent_dark": "#9AA9F2",
   "research": [
